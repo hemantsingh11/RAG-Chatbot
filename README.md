@@ -21,15 +21,15 @@ This chatbot uses a RAG approach to first retrieve relevant document segments fr
 
 1. **Document Ingestion & Preprocessing:**  
    The PDFs stored in a specified azure blob storage are loaded and split into manageable chunks.  
-   (_See [document_loader.py](#document_loaderpy) for details._)
+   (_See [document_loader.py](./src/document_loader.py) for details._)
 
 2. **Vector Store Management:**  
    ChromaDB is used to create or update a vector store from the document chunks. The vector store leverages OpenAI embeddings for semantic search.  
-   (_See [vector_store.py](#vector_storepy) for details._)
+   (_See [vector_store.py](./src/vector_store.py) for details._)
 
 3. **Conversational Retrieval Chain:**  
    When the chatbot starts, it loads and indexes the documents, sets up a retriever from the vector store, and initializes a retrieval-based conversation chain with memory.  
-   (_See [main.py](#mainpy) for details._)
+   (_See [main.py](./src/main.py) for details._)
 
 4. **User Interaction:**  
    Users interact through a Chainlit chat interface. On each query, the system:
