@@ -3,9 +3,11 @@
 import os
 from dotenv import load_dotenv
 import chainlit as cl
+from prompts.system_message import SYSTEM_PROMPT
 
 # Load environment variables from .env file
 # load_dotenv()
+from langchain.prompts import ChatPromptTemplate
 
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.chains import ConversationalRetrievalChain
@@ -50,18 +52,26 @@ async def on_chat_start():
         return_messages=True,
     )
     
-    # Create a conversational retrieval chain using a streaming-enabled ChatOpenAI
+    # Modified prompt now includes a {context} placeholder
+    qa_prompt = ChatPromptTemplate.from_messages([
+        (
+            "system",SYSTEM_PROMPT
+        ),
+        ("human", "Context: {context}\nQuestion: {question}"),
+    ])
+
     chain = ConversationalRetrievalChain.from_llm(
         ChatOpenAI(
-            model_name="gpt-4o-mini",  # Change this model as needed
+            model_name="gpt-4o-mini",
             temperature=0,
             streaming=True,
             openai_api_key=OPENAI_API_KEY,
         ),
-        chain_type="stuff",  # "stuff" concatenates docs; see LangChain docs for other options
+        chain_type="stuff",
         retriever=retriever,
         memory=memory,
         return_source_documents=True,
+        combine_docs_chain_kwargs={"prompt": qa_prompt}
     )
     
     # Store the chain in the user session for later retrieval in on_message
