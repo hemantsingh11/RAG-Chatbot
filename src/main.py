@@ -20,8 +20,15 @@ from vector_store import create_or_load_vector_store
 
 from dotenv import load_dotenv
 from pathlib import Path
+
+# Import our Azure PDF loader and the text splitter
+from document_loader import load_pdf_documents_from_azure, split_documents
+
+# Load environment variables from .env file
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+AZURE_CONNECTION_STRING = os.getenv("AZURE_CONNECTION_STRING")
+AZURE_CONTAINER_NAME = os.getenv("AZURE_CONTAINER_NAME")
 
 @cl.on_chat_start
 async def on_chat_start():
@@ -34,7 +41,9 @@ async def on_chat_start():
     docs_folder = os.path.join(os.path.dirname(__file__), "..", "docs")
     
     # Load PDFs and split them into chunks
-    docs = load_pdf_documents(docs_folder)
+    # docs = load_pdf_documents(docs_folder)
+    docs = load_pdf_documents_from_azure(AZURE_CONTAINER_NAME, AZURE_CONNECTION_STRING)
+
     chunks = split_documents(docs)
     
     # Create (or load) the vector store using our pre-defined function
@@ -76,7 +85,7 @@ async def on_chat_start():
     
     # Store the chain in the user session for later retrieval in on_message
     cl.user_session.set("chain", chain)
-    await cl.send_message("Document processing complete. You can now ask questions.")
+    await cl.Message("Document processing complete. You can now ask questions.").send()
 
 @cl.on_message
 async def main(message: cl.Message):

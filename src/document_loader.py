@@ -5,6 +5,52 @@ from glob import glob
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
+
+# In document_loader.py (or create a new module if preferred)
+
+import os
+import tempfile
+from azure.storage.blob import ContainerClient
+from langchain_community.document_loaders import PyPDFLoader
+
+def load_pdf_documents_from_azure(container_name: str, connection_string: str):
+    """
+    Loads all PDF documents from an Azure Blob Storage container.
+    
+    Args:
+        container_name (str): The name of your Azure Blob Storage container.
+        connection_string (str): Your Azure Storage connection string.
+        
+    Returns:
+        list: A list of Document objects loaded from the PDFs.
+    """
+    container_client = ContainerClient.from_connection_string(
+        conn_str=connection_string, container_name=container_name
+    )
+    
+    documents = []
+    
+    # List all blobs in the container and filter for PDF files
+    for blob in container_client.list_blobs():
+        if blob.name.lower().endswith(".pdf"):
+            # Download the blob's content
+            downloader = container_client.download_blob(blob)
+            pdf_bytes = downloader.readall()
+            
+            # Write the PDF content to a temporary file
+            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+                tmp.write(pdf_bytes)
+                tmp.flush()
+                # Use PyPDFLoader to load the document from the temporary file
+                loader = PyPDFLoader(tmp.name)
+                docs = loader.load()
+                documents.extend(docs)
+            # Clean up the temporary file
+            os.remove(tmp.name)
+            
+    return documents
+
+
 def load_pdf_documents(docs_folder: str):
     """
     Loads all PDF documents from the specified folder.
