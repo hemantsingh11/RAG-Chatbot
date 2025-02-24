@@ -195,15 +195,34 @@ To set up this chatbot for your own use, follow these steps:
    git clone https://github.com/hemantsingh11/RAG-Chatbot.git
    cd project
    pip install -r requirements.txt
+   ```
+
+2. Set up environment variable:
+
+   Create a .env file in root directory and add following variables.
+   ```bash
+   # Select LLM provider (only openai supported right now)
+   LLM_PROVIDER=openai
+
+   # provide your API key:
+   OPENAI_API_KEY=<your_api_key>
+
+   # Azure Storage Account
+   AZURE_CONNECTION_STRING="<your_blob_storage_connection_string>"
+   AZURE_CONTAINER_NAME=<your_blob_storage_container_name>
+   ```
+
+3. Run chatbot on localhost:
+   ```bash
    chainlit run .\src\main.py
    ```
 
-2. Build and run the chatbot locally:
+4. Build and run the chatbot on docker desktop:
    ```bash
    docker build -t chainlit-chatbot .
    docker run -p 8000:8000 chainlit-chatbot
    ```
 
-3. Deploy the container to Azure using Azure Container Apps and configure authentication.
+5. Deploy the container to Azure using Azure Container Apps and configure authentication.
 
 
