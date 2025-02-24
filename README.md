@@ -195,6 +195,7 @@ To set up this chatbot for your own use, follow these steps:
    git clone https://github.com/hemantsingh11/RAG-Chatbot.git
    cd project
    pip install -r requirements.txt
+   chainlit run .\src\main.py
    ```
 
 2. Build and run the chatbot locally:
